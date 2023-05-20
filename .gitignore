@@ -7,6 +7,8 @@ hardhat.config.js
 
 # build
 note.md
+contract___
+
 
 # misc codemirror files
 *.html

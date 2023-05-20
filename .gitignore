@@ -1,0 +1,13 @@
+# npm
+node_modules
+package-lock.json
+
+# hardhat
+hardhat.config.js
+
+# build
+note.md
+
+# misc codemirror files
+*.html
+test.js

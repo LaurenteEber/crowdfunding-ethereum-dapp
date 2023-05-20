@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
 
 pragma solidity >= 0.8.0;
 
-contract crowdfunding {
+contract Crowdfunding {
     enum FundraisingState {Opened, Closed}
     
     struct Project {
@@ -12,6 +12,7 @@ contract crowdfunding {
         FundraisingState state; 
         uint fundraisingGoal; // the goal of the funding
         uint funds;
+        uint numFunders;
     }
 
     mapping(string => Project) public projects;
@@ -32,7 +33,8 @@ contract crowdfunding {
             author: payable(msg.sender),
             state: FundraisingState.Opened,
             fundraisingGoal: _fundraisingGoal,
-            funds: 0
+            funds: 0,
+            numFunders: 0
         });
         projects[_name]=newProject;
         emit NewProject(_name, msg.sender, _description, _fundraisingGoal);
@@ -56,20 +58,19 @@ contract crowdfunding {
         uint amount;
     }
     mapping(string => mapping(uint => Funder)) public funders;
-    mapping(string=>uint) public numFunder; 
 
     function fundProject(string calldata nameProject) public payable {
         require(projects[nameProject].author != msg.sender,"Author don't funding his ouw project");
         require(projects[nameProject].state != FundraisingState.Closed,"The project can not receive funds, it's closed");
         require(msg.value > 0,"Fund value must be greater then 0");
+
         projects[nameProject].author.transfer(msg.value);
-        if (projects[nameProject].funds == 0){
-            numFunder[nameProject] = 0; 
-        } else { 
-            numFunder[nameProject] ++; 
-            }
         projects[nameProject].funds += msg.value;
         emit SendFunding(msg.sender, msg.value);
+        
+        funders[nameProject][projects[nameProject].numFunders] = Funder(msg.sender, msg.value);
+        projects[nameProject].numFunders ++;
+
         if (projects[nameProject].funds >= projects[nameProject].fundraisingGoal) {
             emit RaisingFundGoal(
                 nameProject,
@@ -77,7 +78,6 @@ contract crowdfunding {
                 "fundRaisingGoal reached");
         }
         
-        funders[nameProject][numFunder[nameProject]] = Funder(msg.sender, msg.value);
     }
 
     event ChangeState(
@@ -89,5 +89,14 @@ contract crowdfunding {
         require(msg.sender == projects[nameProject].author, "You sould be the author for this project");
         projects[nameProject].state = newState;
         emit ChangeState(nameProject, newState);
+    }
+
+    function getProject(string memory nameProject) public view returns (Project memory project){
+    project = projects[nameProject];
+    }
+
+    function getFunder(string memory nameProject, uint idFunder) public view returns (Funder memory funder){
+        require(idFunder <= projects[nameProject].numFunders, "That funder in this project doesn't exist");
+        funder = funders[nameProject][idFunder];
     }
 }

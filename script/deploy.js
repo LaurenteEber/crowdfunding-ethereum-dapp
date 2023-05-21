@@ -7,7 +7,7 @@ async function main() {
   const Crowdfunding = await ethers.getContractFactory('Crowdfunding');
   const crowdfunding = await Crowdfunding.deploy();
 
-  console.log("Crowdfunding contract Address", counter.address);
+  console.log("Crowdfunding contract Address", crowdfunding.address);
 }
 
 main()

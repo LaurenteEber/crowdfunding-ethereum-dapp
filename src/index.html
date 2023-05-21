@@ -16,8 +16,8 @@
       <label for="project-name">Enter the project name: <input id="project-name" name="project-name" type="text" required /></label>
       <label for="project-description">Describe your project: <input id="project-description" name="project-description" type="text" required /></label>
       <label for="project-fundraisingGoal">Fundraising Goal: <input id="project-fundraisingGoal" name="project-fundraisingGoal" type="text" required /></label>
+      <button type="button" onclick="createProject()">Register your project</button>
     </fieldset>
-    <button type="button" onclick="createProject()">Register your project</button>
   </form>
 
   <!-- <form id="fund-project">
@@ -35,13 +35,34 @@
   <form id="get-project">
     <fieldset>
       <h2>Know about the projects</h2>
+      <button type="button" onclick="getProjectList()">Get list of projects</button>
       <label for="project-list">Select a project
-        <select  name="project-list" id="project-list">
-          //... select
-        </select>
+        <select  name="project-list" id="projects-list"></select>
       </label>
+      <br>
+      <br>
+      <fieldset id="project-selected">
+        <label for="name-project">Name: <input disabled id="name-project" type="text" /></label>
+
+        <label for="description-project">Description: <input disabled id="description-project" type="text" /></label>
+        
+        <label for="author-project">Author: <input disabled id="author-project" type="text" /></label>
+        
+        <br>
+
+        <label for="fundraisingGoal-project">Fundraising Goal: <input disabled id="fundraisingGoal-project" type="text" /></label>
+
+        <label for="funds-project">Funds acumulated: <input disabled id="funds-project" type="text" /></label>
+
+        <label for="numFunders-project">Funders number: <input disabled id="numFunders-project" type="text" /></label>
+        
+        <br>
+
+        <label for="state-project">State: <input disabled id="state-project" type="text" /></label>
+      </fieldset>
+      <h2>Would you like to fund this project?</h2>
+      <button type="button" onclick="fundProject()">Fund</button>
     </fieldset>
-    <input type="submit" value="Ask for a project"/>
   </form>
 
   <!-- <form id="get-funders">
@@ -68,7 +89,8 @@
     <input type="submit" value="Change the state"/>
   </form> -->
 
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+        type="application/javascript"></script>
   <script>
     const CONTRACT_ABI = [
       {
@@ -430,7 +452,7 @@
       window.ethereum
     );
 
-    provider.send('eth_requestAccount', []).then(() => {
+    provider.send('eth_requestAccounts', []).then(() => {
       provider.listAccounts().then((accounts) => {
         signer = provider.getSigner(accounts[0]);
         contract = new ethers.Contract(
@@ -448,6 +470,34 @@
       await contract.createProject(name, description,fundraisingGoal);
     }
 
+    async function getProjectList() {
+      const nameList = await contract.getProjectsNameList();
+      const selectProject = document.getElementById('projects-list');
+      for (let i=0; i < nameList.length; i++) {
+        const option = nameList[i];
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        selectProject.appendChild(optionElement);
+      }
+    }
+
+    async function projectSelected() {
+      const options = document.getElementsById('projects-list');
+      const optionSelected = options.value;
+      const project = await contract.getProject(optionSelected);
+      document.getElementById('name-project').value = optionSelected;
+      document.getElementById('description-project').value = project[1];
+      document.getElementById('author-project').value = project[2];
+      document.getElementById('state-project').value = project[3];
+      document.getElementById('fundraisingGoal-project').value = project[4];
+      document.getElementById('funds-project').value = project[5];
+      document.getElementById('numFunders-project').value = project[6];
+    }
+
+    async function fundProject() {
+      const nameProject = document.getElementById('name-project').value;
+    }
 
   </script>
   

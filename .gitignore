@@ -14,3 +14,4 @@ note.md
 # misc codemirror files
 *.html
 test.js
+.DS_Store

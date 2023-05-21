@@ -2,7 +2,7 @@
 
 pragma solidity >= 0.8.0;
 
-contract Crowdfunding {
+contract crowdfunding {
     enum FundraisingState {Opened, Closed}
     
     struct Project {
@@ -17,6 +17,7 @@ contract Crowdfunding {
 
     mapping(string => Project) public projects;
     uint idProjects = 0;
+    string[] public projectsNameList;
 
     event NewProject(
         string nameProject,
@@ -38,6 +39,7 @@ contract Crowdfunding {
         });
         projects[_name]=newProject;
         emit NewProject(_name, msg.sender, _description, _fundraisingGoal);
+        projectsNameList.push(_name);
         idProjects ++;
     }
     // mapping´s key is the project´s name
@@ -98,5 +100,9 @@ contract Crowdfunding {
     function getFunder(string memory nameProject, uint idFunder) public view returns (Funder memory funder){
         require(idFunder <= projects[nameProject].numFunders, "That funder in this project doesn't exist");
         funder = funders[nameProject][idFunder];
+    }
+
+    function getProjectsList() public view returns (string[] memory){
+      return projectsNameList;
     }
 }

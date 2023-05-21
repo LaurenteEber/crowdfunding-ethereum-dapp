@@ -102,7 +102,7 @@ contract crowdfunding {
         funder = funders[nameProject][idFunder];
     }
 
-    function getProjectsList() public view returns (string[] memory){
+    function getProjectsNameList() public view returns (string[] memory){
       return projectsNameList;
     }
 }

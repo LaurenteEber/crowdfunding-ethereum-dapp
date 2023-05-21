@@ -2,7 +2,7 @@
 
 pragma solidity >= 0.8.0;
 
-contract crowdfunding {
+contract Crowdfunding {
     enum FundraisingState {Opened, Closed}
     
     struct Project {

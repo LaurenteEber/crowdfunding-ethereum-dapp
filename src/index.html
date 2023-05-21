@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrowdfundingdApp</title>
+</head>
+<body>
+  <h1>Crowdfunding application</h1>
+  <p>We help you to finance your amazing projects</p>
+
+  <form id="register-project">
+    <fieldset>
+      <h2>Register your project</h2>
+      <label for="project-name">Enter the project name: <input id="project-name" name="project-name" type="text" required /></label>
+      <label for="project-description">Describe your project: <input id="project-description" name="project-description" type="text" required /></label>
+      <label for="project-fundraisingGoal">Fundraising Goal: <input id="project-fundraisingGoal" name="project-fundraisingGoal" type="text" required /></label>
+    </fieldset>
+    <button type="button" onclick="createProject()">Register your project</button>
+  </form>
+
+  <!-- <form id="fund-project">
+    <fieldset>
+      <h2>Become a Funder</h2>
+      <label for="project-list">Select a project
+        <select  name="project-list" id="project-list">
+          //... select
+        </select>
+      </label>
+    </fieldset>
+    <input type="submit" value="Fund a project"/>
+  </form> -->
+
+  <form id="get-project">
+    <fieldset>
+      <h2>Know about the projects</h2>
+      <label for="project-list">Select a project
+        <select  name="project-list" id="project-list">
+          //... select
+        </select>
+      </label>
+    </fieldset>
+    <input type="submit" value="Ask for a project"/>
+  </form>
+
+  <!-- <form id="get-funders">
+    <fieldset>
+      <h2>Know about funers of a project</h2>
+      <label for="project-list">Select a project
+        <select  name="project-list" id="project-list">
+          //... select
+        </select>
+      </label>
+    </fieldset>
+    <input type="submit" value="Ask for funders"/>
+  </form>
+
+  <form id="change-stateProject">
+    <fieldset>
+      <h2>Change the state of your project</h2>
+      <label for="project-list">Select a project
+        <select  name="project-list" id="project-list">
+          //... select
+        </select>
+      </label>
+    </fieldset>
+    <input type="submit" value="Change the state"/>
+  </form> -->
+
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script>
+    const CONTRACT_ABI = [
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "enum Crowdfunding.FundraisingState",
+            "name": "newState",
+            "type": "uint8"
+          }
+        ],
+        "name": "ChangeState",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "authorProject",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "descriptionProject",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "fundraisingGoal",
+            "type": "uint256"
+          }
+        ],
+        "name": "NewProject",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "fundRaising",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "mensaje",
+            "type": "string"
+          }
+        ],
+        "name": "RaisingFundGoal",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "funder",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "fund",
+            "type": "uint256"
+          }
+        ],
+        "name": "SendFunding",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "enum Crowdfunding.FundraisingState",
+            "name": "newState",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          }
+        ],
+        "name": "changeProjectState",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_description",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_fundraisingGoal",
+            "type": "uint256"
+          }
+        ],
+        "name": "createProject",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          }
+        ],
+        "name": "fundProject",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "funders",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "funder",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "idFunder",
+            "type": "uint256"
+          }
+        ],
+        "name": "getFunder",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "funder",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Crowdfunding.Funder",
+            "name": "funder",
+            "type": "tuple"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "nameProject",
+            "type": "string"
+          }
+        ],
+        "name": "getProject",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+              },
+              {
+                "internalType": "address payable",
+                "name": "author",
+                "type": "address"
+              },
+              {
+                "internalType": "enum Crowdfunding.FundraisingState",
+                "name": "state",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint256",
+                "name": "fundraisingGoal",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "funds",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "numFunders",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Crowdfunding.Project",
+            "name": "project",
+            "type": "tuple"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getProjectsNameList",
+        "outputs": [
+          {
+            "internalType": "string[]",
+            "name": "",
+            "type": "string[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "name": "projects",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "address payable",
+            "name": "author",
+            "type": "address"
+          },
+          {
+            "internalType": "enum Crowdfunding.FundraisingState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fundraisingGoal",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "funds",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numFunders",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "projectsNameList",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+    const CONTRACT_ADDRESS = '0xd27d2488c964C3aDB9Be64dF3aaA45A68Bd40548';
+    let signer;
+    let contract;
+
+    const provider = new ethers.providers.Web3Provider(
+      window.ethereum
+    );
+
+    provider.send('eth_requestAccount', []).then(() => {
+      provider.listAccounts().then((accounts) => {
+        signer = provider.getSigner(accounts[0]);
+        contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          CONTRACT_ABI,
+          signer
+        );
+      });
+    });
+
+    async function createProject(){
+      const name = document.getElementById('project-name').value;
+      const description = document.getElementById('project-description').value;
+      const fundraisingGoal = document.getElementById('project-fundraisingGoal').value;
+      await contract.createProject(name, description,fundraisingGoal);
+    }
+
+
+  </script>
+  
+</body>
+</html>

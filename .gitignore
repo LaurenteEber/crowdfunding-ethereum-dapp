@@ -12,6 +12,5 @@ note.md
 /cache
 
 # misc codemirror files
-*.html
 test.js
 .DS_Store

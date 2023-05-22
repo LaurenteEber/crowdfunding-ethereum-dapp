@@ -5,11 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CrowdfundingdApp</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <h1>Crowdfunding application</h1>
   <p>We help you to finance your amazing projects</p>
 
+  <!-- Register a projects -->
   <form id="register-project">
     <fieldset>
       <h2>Register your project</h2>
@@ -20,31 +22,17 @@
     </fieldset>
   </form>
 
-  <!-- <form id="fund-project">
-    <fieldset>
-      <h2>Become a Funder</h2>
-      <label for="project-list">Select a project
-        <select  name="project-list" id="project-list">
-          //... select
-        </select>
-      </label>
-    </fieldset>
-    <input type="submit" value="Fund a project"/>
-  </form> -->
-
+  <!-- Get a registed project -->
   <form id="get-project">
     <fieldset>
       <h2>Know about the projects</h2>
       <button type="button" onclick="getProjectList()">Get list of projects</button>
       
       <!-- list registed projects -->
-      <label for="projects-list">Select a project
+      <label for="projects-list" class="projects-list">Select a project
         <select  name="projects-list" id="projects-list"></select>
       </label>
       
-      <br>
-      <br>
-
       <!-- Show selected project -->
       <fieldset id="project-selected">
         <label for="name-project">Name: <input disabled id="name-project" type="text" /></label>

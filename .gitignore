@@ -10,6 +10,7 @@ note.md
 /contract___
 /artifacts
 /cache
+/dist
 
 # misc codemirror files
 test.js

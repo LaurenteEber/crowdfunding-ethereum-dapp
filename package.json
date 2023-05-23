@@ -9,6 +9,7 @@
   "author": "Eber Laurente",
   "license": "ISC",
   "dependencies": {
+    "ethers": "5.7",
     "hardhat": "^2.14.0"
   },
   "devDependencies": {
